@@ -12,6 +12,10 @@ interface ConfigI {
   JWT: {
     SECRET: string;
   };
+
+  IMAGES: {
+    PATH: string;
+  };
 }
 
 export const CONFIG: ConfigI = {
@@ -24,5 +28,8 @@ export const CONFIG: ConfigI = {
   },
   JWT: {
     SECRET: process.env.JWT_SECRET || 'your-jwt-secret',
+  },
+  IMAGES: {
+    PATH: process.env.IMAGES_PATH || 'output',
   },
 };
