@@ -1,0 +1,41 @@
+import { injectable } from 'tsyringe';
+import {
+	Body,
+	Controller,
+	Get,
+	Path,
+	Post,
+	Route,
+	SuccessResponse,
+} from 'tsoa';
+import { I{{pascalCase name}} } from './{{name}}.model';
+import { {{pascalCase name}}sService } from './{{name}}sService';
+
+@injectable()
+@Route('v{{version}}/{{name}}s')
+export class {{pascalCase name}}sController extends Controller {
+	constructor(private {{name}}sService: {{pascalCase name}}sService) {
+		super();
+	}
+
+	@Get('/get/{id}')
+	public async get{{pascalCase name}}(@Path() id: string): Promise<I{{pascalCase name}}> {
+		this.setStatus(200);
+		return this.{{name}}sService.get(id);
+	}
+
+	@Get('/all')
+	public async getAll(): Promise<I{{pascalCase name}}[]> {
+		this.setStatus(200); // set return status 200
+		return this.{{name}}sService.getAll();
+	}
+
+	@SuccessResponse('201', 'Created')
+	@Post()
+	public async create{{pascalCase name}}(
+		@Body() requestBody: { name: string },
+	): Promise<void> {
+		this.setStatus(201);
+		return this.{{name}}sService.create(requestBody);
+	}
+}

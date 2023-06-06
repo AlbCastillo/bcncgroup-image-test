@@ -1,0 +1,6 @@
+{
+    "exec": "ts-node src/server.ts",
+    "watch": ["src", "tsoa.json"],
+    "ext": "ts",
+    "ignore": ["src/tsoa_generated/"]
+}

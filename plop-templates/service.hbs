@@ -1,0 +1,63 @@
+/* eslint-disable class-methods-use-this */
+import { singleton } from 'tsyringe';
+import { I{{pascalCase name}}, {{pascalCase name}}Model } from './{{name}}.model';
+import logger from '../../../logging/winstonLogger';
+import { ApiError } from '../../../middlewares/apiErrors';
+
+@singleton()
+export class {{pascalCase name}}sService {
+	/**
+	 * !! DEFAULT METHODS
+	 */
+	public async get(id: string): Promise<I{{pascalCase name}}> {
+		try {
+			logger.info(`Getting {{pascalCase name}} with ${id}`);
+			const {{name}} = await {{pascalCase name}}Model.findOne({ id });
+			if ({{name}}) {
+				return {{name}};
+			}
+			throw new Error('{{pascalCase name}} not found!');
+		} catch (error: any) {
+			logger.error(`Error getting {{pascalCase name}}: ${error.mssage}`);
+			if (error.message === '{{pascalCase name}} not found!') {
+				throw new ApiError({
+					statusCode: 404,
+					name: 'NotFound',
+					message: error.message,
+				});
+			}
+			throw new ApiError({
+				statusCode: 500,
+				name: 'InternalServerError',
+				message: `Opps and error ocurred!`,
+			});
+		}
+	}
+
+	public async getAll(): Promise<I{{pascalCase name}}[]> {
+		try {
+			const {{name}}s = await {{pascalCase name}}Model.find();
+			return {{name}}s;
+		} catch (error: any) {
+			throw new ApiError({
+				statusCode: 500,
+				name: 'InternalServerError',
+				message: `Opps an error ocurred!`,
+			});
+		}
+	}
+
+	public async create({{name}}: { name: string }): Promise<void> {
+		try {
+			logger.info(`Creating a new {{pascalCase name}}`);
+			await {{pascalCase name}}Model.create({{name}});
+		} catch (error: any) {
+			logger.error(`Error creating {{pascalCase name}}`);
+			throw new ApiError({
+				statusCode: 500,
+				name: 'InternalServerError',
+				message: `Opps an error ocurred`,
+			});
+		}
+	}
+}
