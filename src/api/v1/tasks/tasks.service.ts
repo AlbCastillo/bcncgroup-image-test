@@ -5,7 +5,7 @@ import taskModel from './models/tasks.model';
 import { TaskI } from './models/tasks.schema';
 import { CONFIG } from '../../../config';
 import { ApiError } from '../../../middlewares/apiErrors';
-import { getExpressMulterFileInfo } from '../../../utils/file';
+import { getExpressMulterFileInfo, saveImage } from '../../../utils/file';
 import { HTTP_ERRORS } from '../../../utils/httpErrors';
 
 @singleton()
@@ -19,11 +19,12 @@ export class TasksService {
   async createTask(file: Express.Multer.File): Promise<TaskI> {
     this.validateImageFormat(file);
     const fileInfo = getExpressMulterFileInfo(file);
+    const originalImagePath = `${CONFIG.IMAGES.PATH}/${fileInfo.name}/original`;
     const newTask = await taskModel.create({
       fileName: fileInfo.originalname,
-      path: `${CONFIG.IMAGES.PATH}/${fileInfo.originalname}`,
+      path: originalImagePath,
     });
-
+    await saveImage(fileInfo, originalImagePath);
     // TODO: ADD LAMBDA FUNCTION
     return newTask;
   }
