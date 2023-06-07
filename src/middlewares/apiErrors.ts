@@ -35,19 +35,39 @@ export function errorAPIHandler(
       message: err.message,
     });
   }
+
   if (err instanceof ValidateError) {
+    // Manejo de errores de validación
     return res.status(422).json({
       name: 'ValidationError',
       statusCode: 422,
-      message: err.message,
+      message: 'Validation error',
+      details: err?.fields,
     });
   }
+
   if (err instanceof Error) {
+    // Resto de manejo de errores
+    if (err.name === 'CastError') {
+      return res.status(400).json({
+        name: 'BadRequest',
+        statusCode: 400,
+        message: 'Bad request',
+      });
+    }
+    if (err.name === 'NotFoundError') {
+      return res.status(404).json({
+        name: 'NotFound',
+        statusCode: 404,
+        message: 'Resource not found',
+      });
+    }
     return res.status(500).json({
       name: 'InternalServerError',
       statusCode: 500,
-      message: err.message,
+      message: 'Server error',
     });
   }
+
   next();
 }
