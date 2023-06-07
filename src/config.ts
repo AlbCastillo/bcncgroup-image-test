@@ -15,6 +15,8 @@ interface ConfigI {
 
   IMAGES: {
     PATH: string;
+    SUPPORTED_FORMATS: string[];
+    MAX_FILE_SIZE: number;
   };
 }
 
@@ -31,5 +33,7 @@ export const CONFIG: ConfigI = {
   },
   IMAGES: {
     PATH: process.env.IMAGES_PATH || 'output',
+    SUPPORTED_FORMATS: ['jpg', 'jpeg', 'png', 'tiff', 'bmp'],
+    MAX_FILE_SIZE: 10 * 1024 * 1024,
   },
 };
