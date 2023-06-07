@@ -1,72 +1,56 @@
 import { Request, Response, NextFunction } from 'express';
 import { ValidateError } from 'tsoa';
 
+import { HTTP_ERRORS, HttpError } from '../utils/httpErrors';
+
 /**
  * API ERROR CLASS
  */
 export class ApiError extends Error {
-  statusCode: number;
+  readonly name: string;
+  readonly statusCode: number;
+  readonly message: string;
 
-  constructor({
-    name,
-    statusCode,
-    message,
-  }: {
-    name: string;
-    statusCode: number;
-    message?: string;
-  }) {
-    super(message);
+  constructor(httpError: HttpError, message?: string) {
+    const { name, statusCode }: HttpError = httpError;
+    const defaultMessage = httpError.message;
+    super(message || defaultMessage);
     this.name = name;
     this.statusCode = statusCode;
+    this.message = message || defaultMessage;
   }
 }
 
 export function errorAPIHandler(
-  err: unknown,
+  err: unknown | ApiError,
   req: Request,
   res: Response,
   next: NextFunction,
 ): Response | void {
   if (err instanceof ApiError) {
-    return res.status(err.statusCode).json({
-      name: err.name,
-      statusCode: err.statusCode,
-      message: err.message,
-    });
+    return res
+      .status(err.statusCode)
+      .json({ name: err.name, statusCode: err.statusCode, message: err.message });
   }
 
   if (err instanceof ValidateError) {
-    // Manejo de errores de validación
-    return res.status(422).json({
-      name: 'ValidationError',
-      statusCode: 422,
-      message: 'Validation error',
-      details: err?.fields,
-    });
+    const { name, statusCode, message } = HTTP_ERRORS.VALIDATION_ERROR;
+    return res
+      .status(statusCode)
+      .json({ name, statusCode, message, details: err?.fields });
   }
 
   if (err instanceof Error) {
-    // Resto de manejo de errores
     if (err.name === 'CastError') {
-      return res.status(400).json({
-        name: 'BadRequest',
-        statusCode: 400,
-        message: 'Bad request',
-      });
+      const { name, statusCode, message } = HTTP_ERRORS.BAD_REQUEST;
+      return res.status(statusCode).json({ name, statusCode, message });
     }
     if (err.name === 'NotFoundError') {
-      return res.status(404).json({
-        name: 'NotFound',
-        statusCode: 404,
-        message: 'Resource not found',
-      });
+      const { name, statusCode, message } = HTTP_ERRORS.NOT_FOUND;
+      return res.status(statusCode).json({ name, statusCode, message });
     }
-    return res.status(500).json({
-      name: 'InternalServerError',
-      statusCode: 500,
-      message: 'Server error',
-    });
+    const { name, statusCode, message } = HTTP_ERRORS.INTERNAL_SERVER_ERROR;
+    return res.status(statusCode).json({ name, statusCode, message });
   }
 
   next();
