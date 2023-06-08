@@ -5,8 +5,9 @@ import taskModel from './models/tasks.model';
 import { TaskI } from './models/tasks.schema';
 import { CONFIG } from '../../../config';
 import { ApiError } from '../../../middlewares/apiErrors';
-import { getExpressMulterFileInfo, saveImage } from '../../../utils/file';
+import { TASK_STATE } from '../../../utils/enum';
 import { HTTP_ERRORS } from '../../../utils/httpErrors';
+import { ImagesService } from '../images/images.service';
 
 @singleton()
 export class TasksService {
@@ -16,21 +17,49 @@ export class TasksService {
 
   SUPPORTED_IMAGES = CONFIG.IMAGES.SUPPORTED_FORMATS;
 
+  constructor(private imagesService: ImagesService) {}
+
   async createTask(file: Express.Multer.File): Promise<TaskI> {
-    this.validateImageFormat(file);
-    const fileInfo = getExpressMulterFileInfo(file);
-    const originalImagePath = `${CONFIG.IMAGES.PATH}/${fileInfo.name}/original`;
+    const { originalImageAbsolutePath, imagesPath } =
+      await this.imagesService.createOriginalImage(file);
+
     const newTask = await taskModel.create({
-      fileName: fileInfo.originalname,
-      path: originalImagePath,
+      fileName: file.originalname,
+      path: imagesPath,
+      imagesPath: {
+        original: originalImageAbsolutePath,
+      },
     });
-    await saveImage(fileInfo, originalImagePath);
-    // TODO: ADD LAMBDA FUNCTION
+
     return newTask;
   }
 
-  async getAllTasks(): Promise<TaskI[]> {
-    return await taskModel.find();
+  async completeTask(findTaskDto: FindTaskDto): Promise<TaskI> {
+    const task = await this.getTask({ id: findTaskDto.id });
+
+    const resizedPaths = await this.imagesService.resizeImages(task);
+
+    const updatedTask = await taskModel.findByIdAndUpdate(
+      task._id,
+      {
+        state: TASK_STATE.DONE,
+        imagesPath: {
+          original: task.imagesPath.original,
+          image800: resizedPaths[0],
+          images1024: resizedPaths[1],
+        },
+      },
+      {
+        new: true,
+      },
+    );
+    if (updatedTask) return updatedTask;
+    throw new ApiError(HTTP_ERRORS.NOT_FOUND, 'Task not found');
+  }
+
+  async getTasks(findTaskDto: FindTaskDto | {}): Promise<TaskI[]> {
+    const search = this.whereFieldGenerator(findTaskDto);
+    return await taskModel.find(search).exec();
   }
 
   async getTask(findTaskDto: FindTaskDto): Promise<TaskI> {
@@ -39,15 +68,11 @@ export class TasksService {
     throw new ApiError(HTTP_ERRORS.NOT_FOUND);
   }
 
-  private validateImageFormat(file: Express.Multer.File) {
-    if (
-      file.size > this.MAX_FILE_SIZE ||
-      !this.SUPPORTED_IMAGES.includes(file.mimetype)
-    ) {
-      throw new ApiError(
-        HTTP_ERRORS.BAD_REQUEST,
-        'Invalid image format or the image is too huge',
-      );
+  private whereFieldGenerator(search: FindTaskDto) {
+    let result: any = {};
+    if (search) {
+      if (search.state) result = { ...result, state: search.state };
     }
+    return result;
   }
 }
