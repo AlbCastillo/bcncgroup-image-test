@@ -1,9 +1,17 @@
-import { Route, Controller, Get, Path, Post, SuccessResponse, UploadedFile } from 'tsoa';
+import {
+  Route,
+  Controller,
+  Get,
+  Path,
+  Post,
+  SuccessResponse,
+  UploadedFile,
+  Query,
+} from 'tsoa';
 import { injectable } from 'tsyringe';
 
 import { TaskI } from './models/tasks.schema';
 import { TasksService } from './tasks.service';
-import logger from '../../../logging/winstonLogger';
 
 @injectable()
 @Route('v1/task')
@@ -12,25 +20,32 @@ export class TasksController extends Controller {
     super();
   }
 
-  @Get('/{taskId}')
+  @Get('/get/{taskId}')
   @SuccessResponse('200', 'OK')
   async getTask(@Path() taskId: string): Promise<TaskI> {
     this.setStatus(200);
     return this.tasksService.getTask({ id: taskId });
   }
 
-  @Get('/all')
+  @Get('/tasks')
   @SuccessResponse('200', 'OK')
-  async getAllTask(): Promise<TaskI[]> {
+  async getTasks(@Query() state?: string): Promise<TaskI[]> {
     this.setStatus(200);
-    return this.tasksService.getAllTasks();
+    const findTasksDto = state ? { state } : {};
+    return this.tasksService.getTasks(findTasksDto);
   }
 
   @Post()
   @SuccessResponse('200', 'OK')
   async createTask(@UploadedFile() file: Express.Multer.File): Promise<TaskI> {
     this.setStatus(200);
-    logger.info('ENTRO CONTROLLER');
     return this.tasksService.createTask(file);
+  }
+
+  @Post('/complete/{taskId}')
+  @SuccessResponse('200', 'OK')
+  async completeTask(@Path() taskId: string): Promise<TaskI> {
+    this.setStatus(200);
+    return this.tasksService.completeTask({ id: taskId });
   }
 }

@@ -7,6 +7,11 @@ export interface TaskI extends Document {
   state: TASK_STATE;
   fileName: string;
   path: string;
+  imagesPath: {
+    original: string;
+    image800: string;
+    image1024: string;
+  };
 }
 
 // MONGOOSE TASK SCHEMA
@@ -24,6 +29,10 @@ export const TaskSchema: Schema<TaskI> = new Schema(
     path: {
       type: String,
       required: true,
+    },
+    imagesPath: {
+      type: Schema.Types.Mixed,
+      nullable: true,
     },
   },
   {
