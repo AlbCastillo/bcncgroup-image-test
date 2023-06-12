@@ -2,7 +2,7 @@ import * as crypto from 'crypto';
 import { promises as fsPromises } from 'fs';
 import { dirname, join, resolve } from 'path';
 
-interface ExpressMulterFileInfo {
+export interface ExpressMulterFileInfo {
   size: number;
   buffer64: string;
   name: string;

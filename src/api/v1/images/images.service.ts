@@ -1,11 +1,12 @@
 import axios from 'axios';
 import { singleton } from 'tsyringe';
 
+import imageModel from './models/image.model';
 import { CONFIG } from '../../../config';
 import { ApiError } from '../../../middlewares/apiErrors';
 import {
+  ExpressMulterFileInfo,
   base64ToSaveImageInput,
-  getExpressMulterFileInfo,
   imageToBase64,
   saveImage,
 } from '../../../utils/file';
@@ -24,54 +25,65 @@ export class ImagesService {
 
   RESIZE_LAMBDA_URL = CONFIG.AWS.RESIZE_LAMBDA;
 
-  // 	{
-  //   "state": "PENDING",
-  //   "fileName": "CandongoQR-EntityDiagram.drawio.png",
-  //   "path": "output/CandongoQR-EntityDiagram.drawio",
-  //   "imagesPath": {
-  //     "original": "/home/albcastillo/PROJECTS/PERSONAL/Prueba/bcncgroup-image-test/output/CandongoQR-EntityDiagram.drawio/original/2771302ffd45b72cd884838bbddd62cc.png"
-  //   },
-  //   "_id": "648206043fec42f58749fcdb",
-  //   "createdAt": "2023-06-08T16:47:00.286Z",
-  //   "updatedAt": "2023-06-08T16:47:00.286Z",
-  //   "__v": 0
-  // }
   async resizeImages(task: TaskI): Promise<any> {
     try {
-      const resizeImages = await axios.post(this.RESIZE_LAMBDA_URL, {
-        imageBase64: await imageToBase64(task.imagesPath.original),
-        widths: this.IMAGE_WIDTHS,
+      const imageOriginal = await imageModel.findOne({
+        task: task._id,
+        width: 'original',
       });
 
-      const response = resizeImages.data;
+      if (imageOriginal) {
+        const resizeImages = await axios.post(this.RESIZE_LAMBDA_URL, {
+          imageBase64: await imageToBase64(imageOriginal.imagePath),
+          widths: this.IMAGE_WIDTHS,
+        });
 
-      const result = await Promise.all(
-        this.IMAGE_WIDTHS.map(async width => {
-          const resizedImage64 = response[width.toString()];
-          return await saveImage(
-            base64ToSaveImageInput(resizedImage64, task.fileName),
-            `${task.path}/${width}`,
-          );
-        }),
-      );
-      return result;
+        const response = resizeImages.data;
+
+        const result = await Promise.all(
+          this.IMAGE_WIDTHS.map(async width => {
+            const resizedImage64 = response[width.toString()];
+            const resizedImagePath = await saveImage(
+              base64ToSaveImageInput(resizedImage64, task.fileName),
+              `${task.path}/${width}`,
+            );
+            await imageModel.create({
+              task: task._id,
+              filename: imageOriginal.filename,
+              contentType: imageOriginal.contentType,
+              imagePath: resizedImagePath,
+              width: width.toString(),
+            });
+            return;
+          }),
+        );
+        return result;
+      }
     } catch (error) {
       throw new ApiError(HTTP_ERRORS.INTERNAL_SERVER_ERROR, 'Error resizing images');
     }
   }
 
-  async createOriginalImage(file: Express.Multer.File): Promise<any> {
+  async createOriginalImage(
+    file: ExpressMulterFileInfo,
+    imagesPath: string,
+    taskId: string,
+  ): Promise<any> {
     try {
       this.validateImageFormat(file);
 
-      const fileInfo = getExpressMulterFileInfo(file);
-
-      const imagesPath = `${CONFIG.IMAGES.PATH}/${fileInfo.name}`;
-
       const originalImageAbsolutePath = await saveImage(
-        { name: fileInfo.originalname, buffer: fileInfo.buffer },
+        { name: file.originalname, buffer: file.buffer },
         `${imagesPath}/original`,
       );
+
+      await imageModel.create({
+        task: taskId,
+        filename: file.originalname,
+        contentType: file.mimetype,
+        imagePath: originalImageAbsolutePath,
+        width: 'original',
+      });
 
       return { originalImageAbsolutePath, imagesPath };
     } catch (error) {
@@ -82,7 +94,18 @@ export class ImagesService {
     }
   }
 
-  private validateImageFormat(file: Express.Multer.File) {
+  async downloadImage(downloadImageDto: any): Promise<any> {
+    try {
+      const image = await imageModel.findOne({
+        task: downloadImageDto.taskId,
+        width: downloadImageDto.width,
+      });
+      return image;
+    } catch (error) {
+      throw new ApiError(HTTP_ERRORS.INTERNAL_SERVER_ERROR, 'Error downloading image');
+    }
+  }
+  private validateImageFormat(file: ExpressMulterFileInfo) {
     if (
       file.size > this.MAX_FILE_SIZE ||
       !this.SUPPORTED_IMAGES.includes(file.mimetype)

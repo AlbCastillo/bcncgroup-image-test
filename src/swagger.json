@@ -1,323 +1,314 @@
 {
-  "openapi": "3.0.0",
-  "info": {
-    "description": "This is an example of documentation using Swagger",
-    "version": "1.0.0",
-    "title": "Express TSOA Typescript Boilerplate",
-    "termsOfService": "http://swagger.io/terms/",
-    "contact": {
-      "email": "example@mail.com"
-    },
-    "license": {
-      "name": "ISC",
-      "url": "https://opensource.org/licenses/ISC"
-    }
-  },
-  "servers": [
-    {
-      "url": "http://localhost:8080",
-      "description": "Local server"
-    }
-  ],
-  "tags": [
-    {
-      "name": "Example Routes",
-      "description": "Hello World"
-    },
-    {
-      "name": "User Routes",
-      "description": "Some user routes"
-    }
-  ],
-  "paths": {
-    "/": {
-      "get": {
-        "summary": "Hello World example route",
-        "description": "",
-        "operationId": "helloWorld",
-        "tags": ["Example Routes"],
-        "responses": {
-          "200": {
-            "description": "Succesfully get Hello World message",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "message": {
-                      "type": "string",
-                      "example": "Hello World!!"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "statusCode": {
-                      "type": "number",
-                      "example": 500
-                    },
-                    "name": {
-                      "type": "string",
-                      "example": "Internal Server Error"
-                    },
-                    "message": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v1/users/": {
-      "post": {
-        "summary": "Create a new User",
-        "description": "Create a new user with requestBody",
-        "operationId": "createUser",
-        "tags": ["User Routes"],
-        "responses": {
-          "201": {
-            "description": "Successfully create a new User"
-          },
-          "422": {
-            "description": "Validation Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "statusCode": {
-                      "type": "number",
-                      "example": 422
-                    },
-                    "name": {
-                      "type": "string",
-                      "example": "Validation Error"
-                    },
-                    "message": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "statusCode": {
-                      "type": "number",
-                      "example": 500
-                    },
-                    "name": {
-                      "type": "string",
-                      "example": "Internal Server Error"
-                    },
-                    "message": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v1/users/get/{userId}": {
-      "get": {
-        "summary": "Get a User",
-        "description": "Get a user by Id",
-        "tags": ["User Routes"],
-        "parameters": [
-          {
-            "in": "path",
-            "name": "userId",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Succesfully get User",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "_id": {
-                      "type": "string",
-                      "example": "mongoId"
-                    },
-                    "firstname": {
-                      "type": "string"
-                    },
-                    "lastmane": {
-                      "type": "string"
-                    },
-                    "email": {
-                      "type": "string"
-                    },
-                    "id": {
-                      "type": "string",
-                      "example": "uuidv4"
-                    },
-                    "createdAt": {
-                      "type": "string",
-                      "example": "YYYY-MM-DDTHH:MM:ss"
-                    },
-                    "updatedAt": {
-                      "type": "string",
-                      "example": "YYYY-MM-DDTHH:MM:ss"
-                    },
-                    "__v": {
-                      "type": "number"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "NotFound Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "statusCode": {
-                      "type": "number",
-                      "example": 404
-                    },
-                    "name": {
-                      "type": "string",
-                      "example": "Internal Server Error"
-                    },
-                    "message": {
-                      "type": "string",
-                      "example": "User not found!"
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "statusCode": {
-                      "type": "number",
-                      "example": 500
-                    },
-                    "name": {
-                      "type": "string",
-                      "example": "Internal Server Error"
-                    },
-                    "message": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v1/users/all": {
-      "get": {
-        "summary": "Get all Users",
-        "description": "Get all users",
-        "tags": ["User Routes"],
-        "responses": {
-          "200": {
-            "description": "Sucessfully get all users",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "_id": {
-                        "type": "string",
-                        "example": "mongoId"
-                      },
-                      "firstname": {
-                        "type": "string"
-                      },
-                      "lastmane": {
-                        "type": "string"
-                      },
-                      "email": {
-                        "type": "string"
-                      },
-                      "id": {
-                        "type": "string",
-                        "example": "uuidv4"
-                      },
-                      "createdAt": {
-                        "type": "string",
-                        "example": "YYYY-MM-DDTHH:MM:ss"
-                      },
-                      "updatedAt": {
-                        "type": "string",
-                        "example": "YYYY-MM-DDTHH:MM:ss"
-                      },
-                      "__v": {
-                        "type": "number"
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal Server Error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "statusCode": {
-                      "type": "number",
-                      "example": 500
-                    },
-                    "name": {
-                      "type": "string",
-                      "example": "Internal Server Error"
-                    },
-                    "message": {
-                      "type": "string"
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
+	"openapi": "3.0.0",
+	"components": {
+		"schemas": {
+			"Task": {
+				"properties": {
+					"_id": {
+						"type": "string"
+					},
+					"state": {
+						"type": "string"
+					},
+					"fileName": {
+						"type": "string"
+					},
+					"path": {
+						"type": "string"
+					},
+					"_v": {
+						"type": "number"
+					},
+					"createdAt": {
+						"type": "string"
+					},
+					"updatedAt": {
+						"type": "string"
+					}
+				}
+			},
+			"Image": {
+				"properties": {
+					"task": {
+						"type": "string"
+					},
+					"filename": {
+						"type": "string"
+					},
+					"imagePath": {
+						"type": "string"
+					},
+					"width": {
+						"type": "string"
+					},
+					"contetType": {
+						"type": "string"
+					},
+					"_v": {
+						"type": "number"
+					},
+					"createdAt": {
+						"type": "string"
+					},
+					"updatedAt": {
+						"type": "string"
+					}
+				}
+			}
+		}
+	},
+	"info": {
+		"title": "bcncgroup-image-test",
+		"version": "1.0.0",
+		"description": "Resize images system",
+		"license": {
+			"name": "MIT"
+		},
+		"contact": {
+			"name": "Alberto Castillo"
+		}
+	},
+	"servers": [
+		{
+			"url": "http://localhost:8089",
+			"description": "Local server"
+		}
+	],
+	"tags": [
+		{
+			"name": "Example Routes",
+			"description": "Hello World"
+		},
+		{
+			"name": "Task"
+		},
+		{
+			"name": "Images"
+		}
+	],
+	"paths": {
+		"/": {
+			"get": {
+				"summary": "Hello World example route",
+				"description": "",
+				"operationId": "helloWorld",
+				"tags": [
+					"Example Routes"
+				],
+				"responses": {
+					"200": {
+						"description": "Succesfully get Hello World message",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"message": {
+											"type": "string",
+											"example": "Hello World!!"
+										}
+									}
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Internal Server Error",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "object",
+									"properties": {
+										"statusCode": {
+											"type": "number",
+											"example": 500
+										},
+										"name": {
+											"type": "string",
+											"example": "Internal Server Error"
+										},
+										"message": {
+											"type": "string"
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/v1/image/download/{taskId}/{width}": {
+			"get": {
+				"operationId": "DownloadImage",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"image/png": {},
+							"image/jpeg": {}
+						}
+					}
+				},
+				"tags": [
+					"Images"
+				],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "taskId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"in": "path",
+						"name": "width",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/v1/task/get/{taskId}": {
+			"get": {
+				"operationId": "GetTask",
+				"tags": [
+					"Task"
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Task"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "taskId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/v1/task/tasks": {
+			"get": {
+				"operationId": "GetTasks",
+				"tags": [
+					"Task"
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/Task"
+									},
+									"type": "array"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "query",
+						"name": "state",
+						"required": false,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/v1/task": {
+			"post": {
+				"operationId": "CreateTask",
+				"tags": [
+					"Task"
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Task"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [],
+				"requestBody": {
+					"required": true,
+					"content": {
+						"multipart/form-data": {
+							"schema": {
+								"type": "object",
+								"properties": {
+									"file": {
+										"type": "string",
+										"format": "binary"
+									}
+								},
+								"required": [
+									"file"
+								]
+							}
+						}
+					}
+				}
+			}
+		},
+		"/v1/task/complete/{taskId}": {
+			"post": {
+				"operationId": "CompleteTask",
+				"tags": [
+					"Task"
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Task"
+								}
+							}
+						}
+					}
+				},
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "taskId",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		}
+	}
 }

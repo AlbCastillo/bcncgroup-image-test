@@ -6,6 +6,7 @@ import { TaskI } from './models/tasks.schema';
 import { CONFIG } from '../../../config';
 import { ApiError } from '../../../middlewares/apiErrors';
 import { TASK_STATE } from '../../../utils/enum';
+import { getExpressMulterFileInfo } from '../../../utils/file';
 import { HTTP_ERRORS } from '../../../utils/httpErrors';
 import { ImagesService } from '../images/images.service';
 
@@ -20,16 +21,15 @@ export class TasksService {
   constructor(private imagesService: ImagesService) {}
 
   async createTask(file: Express.Multer.File): Promise<TaskI> {
-    const { originalImageAbsolutePath, imagesPath } =
-      await this.imagesService.createOriginalImage(file);
+    const fileInfo = getExpressMulterFileInfo(file);
+    const imagesPath = `${CONFIG.IMAGES.PATH}/${fileInfo.name}`;
 
     const newTask = await taskModel.create({
       fileName: file.originalname,
       path: imagesPath,
-      imagesPath: {
-        original: originalImageAbsolutePath,
-      },
     });
+
+    await this.imagesService.createOriginalImage(fileInfo, imagesPath, newTask._id);
 
     return newTask;
   }
@@ -37,17 +37,13 @@ export class TasksService {
   async completeTask(findTaskDto: FindTaskDto): Promise<TaskI> {
     const task = await this.getTask({ id: findTaskDto.id });
 
-    const resizedPaths = await this.imagesService.resizeImages(task);
+    await this.imagesService.resizeImages(task);
 
     const updatedTask = await taskModel.findByIdAndUpdate(
       task._id,
       {
         state: TASK_STATE.DONE,
-        imagesPath: {
-          original: task.imagesPath.original,
-          image800: resizedPaths[0],
-          images1024: resizedPaths[1],
-        },
+        updatedAt: new Date(),
       },
       {
         new: true,
