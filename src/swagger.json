@@ -173,6 +173,60 @@
 				]
 			}
 		},
+		"/v1/image/downloadById/{id}": {
+			"get": {
+				"operationId": "DownloadImageById",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					}
+				},
+				"tags": [
+					"Images"
+				],
+				"security": [],
+				"parameters": [
+					{
+						"in": "path",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"type": "string"
+						}
+					}
+				]
+			}
+		},
+		"/v1/image/images": {
+			"get": {
+				"operationId": "GetImages",
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"items": {
+										"$ref": "#/components/schemas/Image"
+									}
+								},
+								"type": "array"
+							}
+						}
+					}
+				},
+				"tags": [
+					"Images"
+				],
+				"security": [],
+				"parameters": []
+			}
+		},
 		"/v1/task/get/{taskId}": {
 			"get": {
 				"operationId": "GetTask",
