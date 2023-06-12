@@ -8,6 +8,7 @@ interface ConfigI {
   };
   MONGO: {
     URI: string;
+    URI_TEST: string;
   };
   JWT: {
     SECRET: string;
@@ -31,6 +32,7 @@ export const CONFIG: ConfigI = {
   },
   MONGO: {
     URI: process.env.MONGO_URI || '',
+    URI_TEST: process.env.MONGO_URI_TEST || '',
   },
   JWT: {
     SECRET: process.env.JWT_SECRET || 'your-jwt-secret',
