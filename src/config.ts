@@ -12,6 +12,16 @@ interface ConfigI {
   JWT: {
     SECRET: string;
   };
+
+  IMAGES: {
+    PATH: string;
+    SUPPORTED_FORMATS: string[];
+    MAX_FILE_SIZE: number;
+    WIDTHS: number[];
+  };
+  AWS: {
+    RESIZE_LAMBDA: string;
+  };
 }
 
 export const CONFIG: ConfigI = {
@@ -24,5 +34,21 @@ export const CONFIG: ConfigI = {
   },
   JWT: {
     SECRET: process.env.JWT_SECRET || 'your-jwt-secret',
+  },
+  IMAGES: {
+    PATH: process.env.IMAGES_PATH || 'output',
+    SUPPORTED_FORMATS: [
+      'image/jpg',
+      'image/jpeg',
+      'image/png',
+      'image/tiff',
+      'image/bmp',
+    ],
+    MAX_FILE_SIZE: 10 * 1024 * 1024,
+    WIDTHS: [800, 1024],
+  },
+  AWS: {
+    RESIZE_LAMBDA:
+      process.env.RESIZE_LAMBDA_URL || 'http://localhost:3000/dev/resizeImage',
   },
 };

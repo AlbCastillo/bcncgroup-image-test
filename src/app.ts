@@ -35,6 +35,7 @@ app.get('/', (req, res) => {
 /**
  * REGISTER ROUTES FROM TSOA
  */
+
 RegisterRoutes(app);
 
 /**

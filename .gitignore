@@ -3,6 +3,7 @@ node_modules
 dist
 build
 logs
+output
 
 src/tsoa_generated
 

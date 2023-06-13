@@ -1,31 +1,29 @@
-# Express Typescript TSOA Boilerplate
+# BCNC GROUP IMAGE-TEST
+Built from my own template.
 
-This is a boilerplate for quickly building RESTful APIs using Node.js, Express, TSOA and Typescript
+In this repository, we have the REST API for image rendering.
 
-This template comes with many features as : JWT authentication, unit and integration tests, module generator ( Model, Service, Controller),
-Swagger documentation, dependency injection container, error handler, logging system and others.
+For the MongoDB database, we will use a MongoDB Atlas instance in its sandbox version, so we don't have to set up anything locally.
 
-In this templat we will use ***MongoDB*** as database and **Mongoose** as ODM
+The images will be stored on ./output
 
 ## Table of Contents
 - [Express TSOA Typescript Boilerplate](#express-tsoa-typescript-boilerplate)
   - [Table of Contents](#table-of-contents)
-  - [Interesting Dependencies](#interesting-dependecies)
+  - [Interesting Dependencies](#interesting-dependencies)
   - [Getting Started](#getting-started)
     - [Installation](#installation)
-    - [Build a new module using Plop](#build-a-new-module-using-plop)
-    - [Swagger-Documentation](#swagger-documentation)
-    - [Husky hook](#husky-hook)
-    - [Available scripts](#available-scripts)
+    - [Swagger Documentation](#swagger-documentation)
+    - [Available Scripts](#available-scripts)
 - [Inspirations](#inspirations)
 - [License](#license)
 
 
 ## Interesting Dependencies
 
-- [TypeScript](https://www.typescriptlang.org/) : Language
+- [TypeScript](https://www.typescriptlang.org/): Language
 
-- [Express.js](https://expressjs.com/): Lightweight web-server application framework
+- [Express.js](https://expressjs.com/): Lightweight web server application framework
 
 - [TSOA](https://tsoa-community.github.io/docs/getting-started.html): Clean Architecture Framework with integrated OpenAPI
 
@@ -35,18 +33,17 @@ In this templat we will use ***MongoDB*** as database and **Mongoose** as ODM
 
 - [Lodash](https://lodash.com): Utility library
 
-- [Mongoose](https://mongoosejs.com): Mongo ODM
+- [Mongoose](https://mongoosejs.com): MongoDB Object Data Modeling (ODM)
 
 - [Swagger UI Express](https://github.com/scottie1984/swagger-ui-express): Documentation generator & hosting
 
-- [ESLint](https://eslint.org/):  Linting and formatting code using
+- [ESLint](https://eslint.org/): Linting and formatting code
 
 - [Dotenv](https://github.com/motdotla/dotenv): Configuration of environment variables
 
-- [EditorConfig](https://editorconfig.org/)
-  for maintain consistent coding style - TBC
+- [EditorConfig](https://editorconfig.org/): Maintaining consistent coding style - TBC
 
-- [Winston](https://github.com/winstonjs/winston) : Logging
+- [Winston](https://github.com/winstonjs/winston): Logging
 
 - [Morgan](https://github.com/expressjs/morgan#readme): HTTP request logger middleware
 
@@ -54,87 +51,71 @@ In this templat we will use ***MongoDB*** as database and **Mongoose** as ODM
 
 - [Serialize-error](https://github.com/sindresorhus/serialize-error): Serialize an Error object into a plain object
 
-- [Supertest](https://github.com/visionmedia/supertest) : high-level abstraction for testing HTTP
+- [Supertest](https://github.com/visionmedia/supertest): High-level abstraction for testing HTTP
 
 - [Nodemon](https://nodemon.io/): Hot reloading
 
-- [Plop](https://plopjs.com/documentation/) : Micro-generator framework to create Controllers,Models & Services
-
-- [Husky](https://typicode.github.io/husky/#): Commit checker
 
 
 ## Getting Started
 
 ### Installation
-It is recommendable install these dependecies as global:
+It is recommended to install the following dependencies globally:
 ```ts-node```
 ```nodemon```
 ```tsoa```
-1. install the dependencies using yarn:
+1. Install the dependencies using yarn:
 ``` bash
- yarn
+yarn
 ```
 2. Rename the file `.env.example` to `.env` (Edit the file if needed).
 
-You can use the command
+You can use the command:
 ```bash
 cp .env.example to .env
 ```
-3. Prepare husky hooks :
-```bash
-yarn prepare:husky
-```
-4. Build the TSOA routes
+
+3. Build the TSOA routes:
 ```bash
 yarn build
 ```
-5. Run the application with live reloading
+4. Run the application with live reloading:
 ```bash
 yarn dev
 ```
-6. After that, go to:
- ```http://localhost:8080``` OR ```http://localhost:8080/v1/users/1```
+5. After that, go to:
+```http://localhost:8089```
 
-
-### Build a new module using Plop
-1. Execute the command:
- ```yarn plop:module ```
-2. Follow the terminal's instructions
-
-Generated files when the command is executed(name & version are prompt's input):
-
-- **Model** : *src/api/v<version>/<name>.model.ts*
-- **Service**: *src/api/v<version>/<name>sService.ts*
-- **Controller**: *src/api/v<version>/<name>sController.ts*
-
-### Swagger-Documentation
+### Swagger Documentation
 
 API Documentation is automatically generated and hosted under `/docs`
 
-To update your API Documentation you must modified the file ```src/swagger.json```
-### Husyk hook
-**pre-commit** : Execute the command ```yarn lint:fix``` before to do a commit
+To update your API Documentation, you must modify the file `src/swagger.json`
 
-Avoid hook : **git commit -m "Your message" --no-verify**
-### Available scripts
+As a note for image downloads, we have decided to use the filter by TaskId and desired width, with the three possible values:
+- original
+- 800
+- 1024
 
-- `yarn build` - Build the routes and specs from tsoa and compile typescript.
-- `yarn lint` - Lint your TS code,
-- `yarn lint:fix` - Lint and automatically fix your TS code.
+Example download endpoint: ```http://localhost:8089/v1/image/{taskId}/original```
+
+### Available Scripts
+
+- `yarn build` - Build the routes and specs from TSOA and compile TypeScript.
+- `yarn lint` - Lint your TypeScript code.
+- `yarn lint:fix` - Lint and automatically fix your TypeScript code.
 - `yarn dev` - Run the server locally.
-- `yarn clean:routes` - Remove build, tsoa_generated and coverage folders
-- `yarn clean:modules`- Remove node_modules
-- `yarn clean:all`-  Execute yarn clean:modules & yarn clean:routes
+- `yarn clean:routes` - Remove build, tsoa_generated, and coverage folders.
+- `yarn clean:modules` - Remove node_modules.
+- `yarn clean:all` - Execute `yarn clean:modules` & `yarn clean:routes`.
 - `yarn test` - Run all tests.
-- `yarn test:unit` - Run unit tests.
 - `yarn test:integration` - Run integration tests.
-- `yarn plop:module` -  generate a new module for API with a simple CRUD
-- `yarn prepare:husky` - prepare husky hooks
 
 ## Inspirations
 - [hagopj13/node-express-boilerplate](https://github.com/hagopj13/node-express-boilerplate)
 - [danielfsouse/express-rest-boilerplate](https://github.com/danielfsousa/express-rest-boilerplate)
 - [vassalloandrea/better-logs-for-exrpess](https://dev.to/vassalloandrea/better-logs-for-expressjs-using-winston-and-morgan-with-typescript-516n)
 - [mert-turkmenoglu/dependency-injection-in-typescript](https://levelup.gitconnected.com/dependency-injection-in-typescript-2f66912d143c)
+
 ## License
 [MIT](LICENSE.md)
