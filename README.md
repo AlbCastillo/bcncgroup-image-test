@@ -15,6 +15,8 @@ The images will be stored on ./output
     - [Installation](#installation)
     - [Swagger Documentation](#swagger-documentation)
     - [Available Scripts](#available-scripts)
+- [API-REST File Tree](#api-rest-file-tree)
+- [Testing](#testing)
 - [Inspirations](#inspirations)
 - [License](#license)
 
@@ -100,7 +102,6 @@ As a note for image downloads, we have decided to use the filter by TaskId and d
 Example download endpoint: ```http://localhost:8089/v1/image/{taskId}/original```
 
 ### Available Scripts
-
 - `yarn build` - Build the routes and specs from TSOA and compile TypeScript.
 - `yarn lint` - Lint your TypeScript code.
 - `yarn lint:fix` - Lint and automatically fix your TypeScript code.
@@ -110,6 +111,70 @@ Example download endpoint: ```http://localhost:8089/v1/image/{taskId}/original``
 - `yarn clean:all` - Execute `yarn clean:modules` & `yarn clean:routes`.
 - `yarn test` - Run all tests.
 - `yarn test:integration` - Run integration tests.
+
+## API-REST File Tree
+```src
+ ┣ api
+ ┃ ┗ v1
+ ┃ ┃ ┣ images
+ ┃ ┃ ┃ ┣ dto
+ ┃ ┃ ┃ ┃ ┗ find-image.dto.ts
+ ┃ ┃ ┃ ┣ models
+ ┃ ┃ ┃ ┃ ┣ image.model.ts
+ ┃ ┃ ┃ ┃ ┗ image.schema.ts
+ ┃ ┃ ┃ ┣ images.controller.ts
+ ┃ ┃ ┃ ┗ images.service.ts
+ ┃ ┃ ┗ tasks
+ ┃ ┃ ┃ ┣ dto
+ ┃ ┃ ┃ ┃ ┗ find-task.dto.ts
+ ┃ ┃ ┃ ┣ models
+ ┃ ┃ ┃ ┃ ┣ tasks.model.ts
+ ┃ ┃ ┃ ┃ ┗ tasks.schema.ts
+ ┃ ┃ ┃ ┣ tasks.controller.ts
+ ┃ ┃ ┃ ┗ tasks.service.ts
+ ┣ logging
+ ┃ ┗ winstonLogger.ts
+ ┣ middlewares
+ ┃ ┣ apiErrors.ts
+ ┃ ┣ authentication.ts
+ ┃ ┗ morganLogger.ts
+ ┣ tsoa_generated
+ ┃ ┣ routes.ts
+ ┃ ┗ swagger.json
+ ┣ utils
+ ┃ ┣ enum.ts
+ ┃ ┣ file.ts
+ ┃ ┣ httpErrors.ts
+ ┃ ┗ sum.ts
+ ┣ app.ts
+ ┣ config.ts
+ ┣ ioc.ts
+ ┣ mongoose.ts
+ ┣ server.ts
+ ┗ swagger.json
+ ```
+
+
+## Testing
+The tests have been created only for the TaskController controller using Jest and Supertest. As a result, coverage will be given to the tasks.controller and tasks.services parts
+
+The tests are running on an instance of Mongo Atlas to avoid affecting the original database
+
+ **Coverage over task code**
+
+	tasks.controller:
+		- % Stmts: 100
+		- % Branch: 100
+		- % Funcs 100
+	tasks.service:
+		- % Stmts: 95
+		- % Branch: 100
+		- % Funcs 100
+
+Run the test using
+```bash
+yarn test
+```
 
 ## Inspirations
 - [hagopj13/node-express-boilerplate](https://github.com/hagopj13/node-express-boilerplate)
