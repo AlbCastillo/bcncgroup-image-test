@@ -41,20 +41,23 @@ export class TasksService {
   async completeTask(findTaskDto: FindTaskDto): Promise<TaskI> {
     const task = await this.getTask({ id: findTaskDto.id });
 
-    await this.imagesService.resizeImages(task);
+    const imageMessage = await this.imagesService.resizeImages(task);
 
-    const updatedTask = await taskModel.findByIdAndUpdate(
-      task._id,
-      {
-        state: TASK_STATE.DONE,
-        updatedAt: new Date(),
-      },
-      {
-        new: true,
-      },
-    );
-    if (updatedTask) return updatedTask;
-    throw new ApiError(HTTP_ERRORS.NOT_FOUND, 'Task not found');
+    if (imageMessage) {
+      const updatedTask = await taskModel.findByIdAndUpdate(
+        task._id,
+        {
+          state: TASK_STATE.DONE,
+          updatedAt: new Date(),
+        },
+        {
+          new: true,
+        },
+      );
+      if (updatedTask) return updatedTask;
+      throw new ApiError(HTTP_ERRORS.INTERNAL_SERVER_ERROR, 'Error completing task!');
+    }
+    throw new ApiError(HTTP_ERRORS.NOT_FOUND, 'Image not found');
   }
 
   async getTasks(findTaskDto: FindTaskDto | {}): Promise<TaskI[]> {
