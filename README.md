@@ -5,6 +5,8 @@ In this repository, we have the REST API for image rendering.
 
 For the MongoDB database, we will use a MongoDB Atlas instance in its sandbox version, so we don't have to set up anything locally.
 
+The images will be stored on ./output
+
 ## Table of Contents
 - [Express TSOA Typescript Boilerplate](#express-tsoa-typescript-boilerplate)
   - [Table of Contents](#table-of-contents)
@@ -55,9 +57,6 @@ For the MongoDB database, we will use a MongoDB Atlas instance in its sandbox ve
 
 - [Nodemon](https://nodemon.io/): Hot reloading
 
-- [Plop](https://plopjs.com/documentation/): Micro-generator framework to create Controllers, Models & Services
-
-- [Husky](https://typicode.github.io/husky/#): Commit checker
 
 
 ## Getting Started
@@ -98,8 +97,6 @@ To update your API Documentation, you must modify the file `src/swagger.json`
 As a note for image downloads, we have decided to use the filter by TaskId and desired width, with the three possible values:
 - original
 - 800
-
-
 - 1024
 
 Example download endpoint: ```http://localhost:8089/v1/image/{taskId}/original```
@@ -113,9 +110,7 @@ Example download endpoint: ```http://localhost:8089/v1/image/{taskId}/original``
 - `yarn clean:modules` - Remove node_modules.
 - `yarn clean:all` - Execute `yarn clean:modules` & `yarn clean:routes`.
 - `yarn test` - Run all tests.
-- `yarn test:unit` - Run unit tests.
 - `yarn test:integration` - Run integration tests.
-- `yarn prepare:husky` - Prepare Husky hooks.
 
 ## API-REST File Tree
 ```src
