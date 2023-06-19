@@ -91,6 +91,12 @@ describe('Task Controller', () => {
       const response = await request(app).get('/v1/task/tasks');
 
       expect(response.body.length).toBe(2);
+      expect(response.body[0].state).toEqual(task1.state);
+    });
+
+    it('/tasks It should return all tasks with state PENDING', async () => {
+      const response = await request(app).get('/v1/task/tasks?state=PENDING');
+      expect(response.body.length).toBe(2);
     });
 
     it('/get/{taskId} It should return a task', async () => {
