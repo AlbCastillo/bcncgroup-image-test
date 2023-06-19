@@ -21,36 +21,43 @@ export class TasksService {
   constructor(private imagesService: ImagesService) {}
 
   async createTask(file: Express.Multer.File): Promise<TaskI> {
-    const fileInfo = getExpressMulterFileInfo(file);
-    const imagesPath = `${CONFIG.IMAGES.PATH}/${fileInfo.name}`;
+    try {
+      const fileInfo = getExpressMulterFileInfo(file);
+      const imagesPath = `${CONFIG.IMAGES.PATH}/${fileInfo.name}`;
 
-    const newTask = await taskModel.create({
-      fileName: file.originalname,
-      path: imagesPath,
-    });
+      const newTask = await taskModel.create({
+        fileName: file.originalname,
+        path: imagesPath,
+      });
 
-    await this.imagesService.createOriginalImage(fileInfo, imagesPath, newTask._id);
+      await this.imagesService.createOriginalImage(fileInfo, imagesPath, newTask._id);
 
-    return newTask;
+      return newTask;
+    } catch (error) {
+      throw new ApiError(HTTP_ERRORS.INTERNAL_SERVER_ERROR, 'Error creating task!');
+    }
   }
 
   async completeTask(findTaskDto: FindTaskDto): Promise<TaskI> {
     const task = await this.getTask({ id: findTaskDto.id });
 
-    await this.imagesService.resizeImages(task);
+    const imageMessage = await this.imagesService.resizeImages(task);
 
-    const updatedTask = await taskModel.findByIdAndUpdate(
-      task._id,
-      {
-        state: TASK_STATE.DONE,
-        updatedAt: new Date(),
-      },
-      {
-        new: true,
-      },
-    );
-    if (updatedTask) return updatedTask;
-    throw new ApiError(HTTP_ERRORS.NOT_FOUND, 'Task not found');
+    if (imageMessage) {
+      const updatedTask = await taskModel.findByIdAndUpdate(
+        task._id,
+        {
+          state: TASK_STATE.DONE,
+          updatedAt: new Date(),
+        },
+        {
+          new: true,
+        },
+      );
+      if (updatedTask) return updatedTask;
+      throw new ApiError(HTTP_ERRORS.INTERNAL_SERVER_ERROR, 'Error completing task!');
+    }
+    throw new ApiError(HTTP_ERRORS.NOT_FOUND, 'Image not found');
   }
 
   async getTasks(findTaskDto: FindTaskDto | {}): Promise<TaskI[]> {

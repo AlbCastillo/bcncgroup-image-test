@@ -28,12 +28,13 @@ export class ImagesService {
   RESIZE_LAMBDA_URL = CONFIG.AWS.RESIZE_LAMBDA;
 
   /**
-   * It resizes images by sending them to a Lambda function and saving the resized versions to the database.
-   * @param {TaskI} task - The `task` parameter is an object of type `TaskI` which contains information about the task that needs to be
-   * performed, such as the task ID, file name, and path.
-   * @returns a Promise that resolves to an array of undefined values.
+   * It resizes images and saves them to a specified path.
+   * @param {TaskI} task - The `task` parameter is an object of type `TaskI`, which contains information about a task that needs to be completed,
+   * such as the task ID, file name, and path.
+   * @returns The function `resizeImages` returns a Promise that resolves to a string message indicating whether the images were resized
+   * successfully or null if there was no original image found.
    */
-  async resizeImages(task: TaskI): Promise<any> {
+  async resizeImages(task: TaskI): Promise<string | null> {
     try {
       const imageOriginal = await imageModel.findOne({
         task: task._id,
@@ -41,32 +42,26 @@ export class ImagesService {
       });
 
       if (imageOriginal) {
-        const resizeImages = await axios.post(this.RESIZE_LAMBDA_URL, {
-          imageBase64: await imageToBase64(imageOriginal.imagePath),
-          widths: this.IMAGE_WIDTHS,
-        });
-
-        const response = resizeImages.data;
-
-        const result = await Promise.all(
+        const response = await this.lambdaResizeImages(imageOriginal);
+        await Promise.all(
           this.IMAGE_WIDTHS.map(async width => {
             const resizedImage64 = response[width.toString()];
             const resizedImagePath = await saveImage(
               base64ToSaveImageInput(resizedImage64, task.fileName),
               `${task.path}/${width}`,
             );
-            await imageModel.create({
+            return await imageModel.create({
               task: task._id,
               filename: imageOriginal.filename,
               contentType: imageOriginal.contentType,
               imagePath: resizedImagePath,
               width: width.toString(),
             });
-            return;
           }),
         );
-        return result;
+        return `Images resized successfully.`;
       }
+      return null;
     } catch (error) {
       throw new ApiError(HTTP_ERRORS.INTERNAL_SERVER_ERROR, 'Error resizing images');
     }
@@ -180,5 +175,20 @@ export class ImagesService {
       if (search.id) result = { ...result, _id: search.id };
     }
     return result;
+  }
+
+  /**
+   * It resizes images using a Lambda function and returns the resized images.
+   * @param {ImageI} imageOriginal - The parameter `imageOriginal` is an object of type `ImageI` which contains information about the original
+   * image, including its file path.
+   * @returns the data received from the POST request made to the `RESIZE_LAMBDA_URL` endpoint after sending the `imageBase64` and `widths`
+   * parameters. The data returned is the result of the image resizing operation performed by the Lambda function.
+   */
+  private async lambdaResizeImages(imageOriginal: ImageI): Promise<any> {
+    const result = await axios.post(this.RESIZE_LAMBDA_URL, {
+      imageBase64: await imageToBase64(imageOriginal.imagePath),
+      widths: this.IMAGE_WIDTHS,
+    });
+    return result.data;
   }
 }
